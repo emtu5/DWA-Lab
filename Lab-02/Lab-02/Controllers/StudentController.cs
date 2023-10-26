@@ -1,5 +1,6 @@
 ﻿using Lab_02.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Lab_02.Controllers
@@ -23,12 +24,58 @@ namespace Lab_02.Controllers
             return students.OrderBy(s => s.Age).ToList();
         }
 
+        [HttpGet("byId/{id}")]
+        public Student GetId(int id)
+        {
+            return students.FirstOrDefault(s => s.Id.Equals(id));
+        }
+
+        [HttpGet("fromRouteWithId/{id}")]
+        public Student GetIdWithFromRoute([FromRoute] int id)
+        {
+            return students.FirstOrDefault(s => s.Id.Equals(id));
+        }
+
+        [HttpGet("fromHeader")]
+        public Student GetByIdWithFromHeader([FromHeader] int id)
+        {
+            return students.FirstOrDefault(s => s.Id.Equals(id));
+        }
+
+        [HttpGet("fromQuery")]
+        public Student GetByIdWithFromQuery([FromQuery] int id)
+        {
+            return students.FirstOrDefault(s => s.Id.Equals(id));
+        }
+
+        /*[HttpGet("fromQueryAsync")]
+        public async Task<Student> GetByIdWithFromQueryAsync([FromQuery] int id)
+        {
+            return students.FirstOrDefaultAsync(s => s.Id.Equals(id));
+        }*/
+
+        // Create
+
         [HttpPost]
         public List<Student> Add(Student student)
         {
             student.Id = students.Count() + 1;
             students.Add(student);
             return students;
+        }
+
+        [HttpPost("fromBody")]
+        public IActionResult AddWithFromBody([FromBody] Student student)
+        {
+            students.Add(student);
+            return Ok(students);
+        }
+
+        [HttpPost("fromForm")]
+        public IActionResult AddWithFromForm([FromForm] Student student)
+        {
+            students.Add(student);
+            return Ok(students);
         }
 
         [HttpDelete]
@@ -51,6 +98,27 @@ namespace Lab_02.Controllers
             return students;
         }
 
-        
+        // Update
+
+        // Partial Update
+
+        [HttpPatch]
+        public IActionResult Patch([FromRoute] int id, [FromBody] JsonPatchDocument<Student> student) {
+            if(student == null)
+            {
+                var studentToUpdate = students.FirstOrDefault(s => s.Id.Equals(id));
+                student.ApplyTo(studentToUpdate, (Microsoft.AspNetCore.JsonPatch.Adapters.IObjectAdapter)ModelState);
+
+                if(!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                return Ok(students);
+            }
+            return BadRequest("Object is null");
+            // return NotFound();
+            // return NoContent();
+            // return Forbid();
+        }
     }
 }
