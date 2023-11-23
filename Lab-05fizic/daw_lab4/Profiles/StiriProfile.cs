@@ -9,6 +9,8 @@ namespace daw_lab4.Profiles
         {
             CreateMap<GetStireDto, Stire>();
             CreateMap<Stire, GetStireDto>();
+            CreateMap<PostStireDto, Stire>();
+            CreateMap<Stire, PostStireDto>();
         }
     }
 }

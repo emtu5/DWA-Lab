@@ -1,4 +1,5 @@
 using daw_lab4.ContextModels;
+using daw_lab4.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,7 +11,7 @@ builder.Services.AddControllers();
 
 builder.Services.AddDbContext<StiriContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Stiri")));
-
+builder.Services.AddScoped<INewsRepository, NewsRepository>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
